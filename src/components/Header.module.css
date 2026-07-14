@@ -1,0 +1,248 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--black);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  height: 64px;
+  gap: 32px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: var(--off-white);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sigma {
+  font-family: 'Georgia', serif;
+  font-size: 22px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+}
+
+.navLink {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gray);
+  padding: 8px 16px;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  color: var(--off-white);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  color: var(--off-white);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.iconBtn:hover { opacity: 1; }
+
+.cartBtn {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--off-white);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--off-white);
+  color: var(--black);
+  font-size: 9px;
+  font-weight: 800;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--off-white);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Search */
+.searchOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.96);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.searchInner {
+  width: 100%;
+  max-width: 680px;
+  padding: 0 24px;
+}
+
+.searchForm {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid var(--off-white);
+  padding-bottom: 16px;
+  gap: 16px;
+}
+
+.searchIcon {
+  color: var(--gray);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--off-white);
+  font-size: 24px;
+  font-weight: 300;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--gray);
+}
+
+.searchClose {
+  background: none;
+  border: none;
+  color: var(--gray);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.searchClose:hover { color: var(--off-white); }
+
+/* Mobile Drawer */
+.drawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 150;
+}
+
+.drawer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 300px;
+  background: var(--gray-light);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.25s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawerLogo {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--off-white);
+}
+
+.drawerNav {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawerLink {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gray);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.2s;
+}
+
+.drawerLink:hover { color: var(--off-white); }
+
+.drawerLogout {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gray);
+  padding: 12px 0;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.drawerLogout:hover { color: var(--off-white); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav { display: none; }
+  .menuBtn { display: flex; }
+  .logo { flex: 1; text-align: center; letter-spacing: 4px; font-size: 16px; }
+}

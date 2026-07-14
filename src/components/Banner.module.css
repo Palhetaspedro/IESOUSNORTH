@@ -1,0 +1,128 @@
+.wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  height: 580px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  transition: background-image 0.6s ease;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.85) 0%,
+    rgba(0,0,0,0.4) 60%,
+    rgba(0,0,0,0.1) 100%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 64px 80px;
+  max-width: 600px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--gray);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.headline {
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--off-white);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.subline {
+  font-size: 16px;
+  color: var(--gray);
+  margin-bottom: 32px;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  margin-top: 24px;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--black);
+  background: var(--off-white);
+  padding: 6px 14px;
+  text-transform: uppercase;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--border);
+  color: var(--off-white);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 5;
+}
+
+.arrow:hover { background: rgba(0,0,0,0.9); }
+.arrowLeft { left: 24px; }
+.arrowRight { right: 24px; }
+
+.dots {
+  position: absolute;
+  bottom: 24px;
+  right: 32px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+
+.dot {
+  width: 24px;
+  height: 2px;
+  background: rgba(242,240,234,0.3);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, width 0.2s;
+}
+
+.dot.active {
+  background: var(--off-white);
+  width: 40px;
+}
+
+@media (max-width: 768px) {
+  .slide { height: 420px; }
+  .content { padding: 32px 24px; }
+  .headline { font-size: 40px; }
+}

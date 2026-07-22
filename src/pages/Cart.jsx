@@ -163,7 +163,7 @@ export default function Cart() {
                   APLICAR
                 </button>
               </div>
-              <p className={styles.couponHint}>Tente: SIGMA10 (10% OFF)</p>
+              <p className={styles.couponHint}>Tente: IΣSOUS (10% OFF)</p>
             </div>
 
             {/* Totals */}

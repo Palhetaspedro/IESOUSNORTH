@@ -1,63 +1,87 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import { products, categories } from "../data/products";
+import { supabase } from "../lib/supabase";
+import { categories } from "../data/products";
 import styles from "./Catalog.module.css";
+
+const adapt = (p) => ({
+  ...p,
+  isNew: p.is_new,
+  isBestSeller: p.is_best_seller,
+  discount: p.discount || 0,
+  images: p.images?.length ? p.images : [],
+  sizes: p.sizes || [],
+  colors: p.colors || [],
+});
 
 export default function Catalog() {
   const [params, setParams] = useSearchParams();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sort, setSort] = useState("novidades");
-  const [selectedCat, setSelectedCat] = useState(params.get("categoria") || "todos");
+  const [selectedCat, setSelectedCat] = useState("todos");
   const [maxPrice, setMaxPrice] = useState(Infinity);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const searchQ = params.get("q") || "";
+  const genderParam = params.get("gender") || "";
 
   useEffect(() => {
     const cat = params.get("categoria");
     if (cat) setSelectedCat(cat);
     const mp = params.get("maxPrice");
     if (mp) setMaxPrice(Number(mp));
-  }, [params]);
+  }, []);
 
-  const filtered = useMemo(() => {
-    let list = [...products];
+  useEffect(() => {
+    fetchProducts();
+  }, [selectedCat, maxPrice, sort, searchQ, genderParam]);
 
-    if (searchQ) {
-      const q = searchQ.toLowerCase();
-      list = list.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-      );
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      let query = supabase
+        .from("products")
+        .select("*")
+        .eq("is_active", true);
+
+      if (searchQ) {
+        query = query.ilike("name", `%${searchQ}%`);
+      }
+
+      if (selectedCat !== "todos") {
+        if (selectedCat === "novidades") query = query.eq("is_new", true);
+        else if (selectedCat === "ofertas") query = query.gt("discount", 0);
+        else query = query.eq("category", selectedCat);
+      }
+
+      if (genderParam) {
+        query = query.eq("gender", genderParam);
+      }
+
+      if (maxPrice !== Infinity) {
+        query = query.lte("price", maxPrice);
+      }
+
+      switch (sort) {
+        case "menor-preco": query = query.order("price", { ascending: true }); break;
+        case "maior-preco": query = query.order("price", { ascending: false }); break;
+        case "desconto": query = query.order("discount", { ascending: false }); break;
+        default: query = query.order("created_at", { ascending: false });
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (err) {
+      console.error("Erro ao buscar produtos:", err.message);
+    } finally {
+      setLoading(false);
     }
-
-    if (selectedCat !== "todos") {
-      if (selectedCat === "novidades") list = list.filter(p => p.isNew);
-      else if (selectedCat === "ofertas") list = list.filter(p => p.discount > 0);
-      else list = list.filter(p => p.category === selectedCat);
-    }
-
-    if (maxPrice !== Infinity) {
-      list = list.filter(p => {
-        const fp = p.discount ? p.price * (1 - p.discount / 100) : p.price;
-        return fp <= maxPrice;
-      });
-    }
-
-    switch (sort) {
-      case "menor-preco":
-        list.sort((a, b) => a.price - b.price); break;
-      case "maior-preco":
-        list.sort((a, b) => b.price - a.price); break;
-      case "desconto":
-        list.sort((a, b) => b.discount - a.discount); break;
-      default:
-        list.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-    }
-
-    return list;
-  }, [selectedCat, maxPrice, sort, searchQ]);
+  };
 
   const clearFilters = () => {
     setSelectedCat("todos");
@@ -68,31 +92,21 @@ export default function Catalog() {
   return (
     <div className={styles.page}>
       <div className="container">
-        {/* Header */}
         <div className={styles.header}>
           <div>
-            {searchQ && (
-              <p className="section-title">BUSCA: "{searchQ}"</p>
-            )}
+            {searchQ && <p className="section-title">BUSCA: "{searchQ}"</p>}
             <h1 className={styles.title}>
               {selectedCat === "todos" ? "TODOS OS PRODUTOS" : selectedCat.toUpperCase()}
             </h1>
-            <p className={styles.count}>{filtered.length} produtos encontrados</p>
+            <p className={styles.count}>{products.length} produtos encontrados</p>
           </div>
           <div className={styles.controls}>
-            <button
-              className={styles.filterToggle}
-              onClick={() => setFiltersOpen(o => !o)}
-            >
-              <SlidersHorizontal size={16} />
-              FILTROS
+            <button className={styles.filterToggle} onClick={() => setFiltersOpen(o => !o)}>
+              <SlidersHorizontal size={16} /> FILTROS
             </button>
             <div className={styles.sortWrapper}>
-              <select
-                className={styles.sort}
-                value={sort}
-                onChange={e => setSort(e.target.value)}
-              >
+              <select className={styles.sort} value={sort}
+                onChange={e => setSort(e.target.value)}>
                 <option value="novidades">Mais Recentes</option>
                 <option value="menor-preco">Menor Preço</option>
                 <option value="maior-preco">Maior Preço</option>
@@ -106,33 +120,45 @@ export default function Catalog() {
         <hr className="divider" />
 
         <div className={styles.layout}>
-          {/* Sidebar Filters */}
           <aside className={`${styles.sidebar} ${filtersOpen ? styles.open : ""}`}>
             <div className={styles.sidebarHeader}>
               <span className={styles.sidebarTitle}>FILTROS</span>
-              <button
-                className={styles.closeFilters}
-                onClick={() => setFiltersOpen(false)}
-              >
+              <button className={styles.closeFilters} onClick={() => setFiltersOpen(false)}>
                 <X size={16} />
               </button>
             </div>
 
-            {/* Categories */}
             <div className={styles.filterGroup}>
               <h4 className={styles.filterTitle}>CATEGORIA</h4>
               {categories.map(cat => (
-                <button
-                  key={cat.id}
+                <button key={cat.id}
                   className={`${styles.filterBtn} ${selectedCat === cat.id ? styles.active : ""}`}
-                  onClick={() => setSelectedCat(cat.id)}
-                >
+                  onClick={() => setSelectedCat(cat.id)}>
                   {cat.label}
                 </button>
               ))}
             </div>
 
-            {/* Price */}
+            <div className={styles.filterGroup}>
+              <h4 className={styles.filterTitle}>GÊNERO</h4>
+              {[
+                { id: "todos-generos", label: "TODOS", val: "" },
+                { id: "masculino", label: "MASCULINO", val: "masculino" },
+                { id: "feminino", label: "FEMININO", val: "feminino" },
+                { id: "unissex", label: "UNISSEX", val: "unissex" },
+              ].map(g => (
+                <button key={g.id}
+                  className={`${styles.filterBtn} ${genderParam === g.val ? styles.active : ""}`}
+                  onClick={() => setParams(p => {
+                    const next = new URLSearchParams(p);
+                    g.val ? next.set("gender", g.val) : next.delete("gender");
+                    return next;
+                  })}>
+                  {g.label}
+                </button>
+              ))}
+            </div>
+
             <div className={styles.filterGroup}>
               <h4 className={styles.filterTitle}>PREÇO MÁX.</h4>
               {[
@@ -140,26 +166,29 @@ export default function Catalog() {
                 { label: "Até R$ 89,90", val: 89.90 },
                 { label: "Todos", val: Infinity },
               ].map(opt => (
-                <button
-                  key={opt.label}
+                <button key={opt.label}
                   className={`${styles.filterBtn} ${maxPrice === opt.val ? styles.active : ""}`}
-                  onClick={() => setMaxPrice(opt.val)}
-                >
+                  onClick={() => setMaxPrice(opt.val)}>
                   {opt.label}
                 </button>
               ))}
             </div>
 
-            {(selectedCat !== "todos" || maxPrice !== Infinity) && (
+            {(selectedCat !== "todos" || maxPrice !== Infinity || genderParam) && (
               <button className={styles.clearBtn} onClick={clearFilters}>
                 LIMPAR FILTROS
               </button>
             )}
           </aside>
 
-          {/* Grid */}
           <div className={styles.gridArea}>
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className={styles.loadingGrid}>
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className={styles.skeleton} />
+                ))}
+              </div>
+            ) : products.length === 0 ? (
               <div className={styles.empty}>
                 <p className={styles.emptyText}>Nenhum produto encontrado.</p>
                 <button className="btn-outline" onClick={clearFilters}>
@@ -168,7 +197,9 @@ export default function Catalog() {
               </div>
             ) : (
               <div className={styles.grid}>
-                {filtered.map(p => <ProductCard key={p.id} product={p} />)}
+                {products.map(p => (
+                  <ProductCard key={p.id} product={adapt(p)} />
+                ))}
               </div>
             )}
           </div>

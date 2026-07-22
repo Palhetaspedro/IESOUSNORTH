@@ -246,3 +246,44 @@
   .menuBtn { display: flex; }
   .logo { flex: 1; text-align: center; letter-spacing: 4px; font-size: 16px; }
 }
+
+.adminLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--off-white);
+  background: var(--gray-light);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  margin-left: 8px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.adminLink:hover {
+  background: var(--off-white);
+  color: var(--black);
+}
+
+.drawerAdminLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--off-white);
+  background: var(--gray-light);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.drawerAdminLink:hover {
+  background: var(--off-white);
+  color: var(--black);
+}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingBag, User, Heart, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, User, Heart, Menu, X, LayoutDashboard } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { navLinks } from "../data/products";
@@ -8,11 +8,13 @@ import styles from "./Header.module.css";
 
 export default function Header() {
   const { totalItems } = useCart();
-  const { user, logout } = useAuth();
+  const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQ, setSearchQ] = useState("");
+
+  const isAdmin = profile?.role === "admin";
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -26,44 +28,41 @@ export default function Header() {
   return (
     <>
       <header className={styles.header}>
-        {/* Mobile Menu Button */}
         <button className={styles.menuBtn} onClick={() => setMenuOpen(true)}>
           <Menu size={20} />
         </button>
 
-        {/* Logo */}
         <Link to="/" className={styles.logo}>
-          <span className={styles.sigma}>I</span>ΣSOUS NØRTH
+          <span className={styles.sigma}>IΣSOUS</span>
         </Link>
 
-        {/* Desktop Nav */}
         <nav className={styles.nav}>
           {navLinks.map(link => (
             <Link key={link.label} to={link.path} className={styles.navLink}>
               {link.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link to="/admin" className={styles.adminLink}>
+              <LayoutDashboard size={13} />
+              ÁREA DO ADMIN
+            </Link>
+          )}
         </nav>
 
-        {/* Actions */}
         <div className={styles.actions}>
           <button className={styles.iconBtn} onClick={() => setSearchOpen(true)}>
             <Search size={18} />
           </button>
-
           <Link to="/favoritos" className={styles.iconBtn}>
             <Heart size={18} />
           </Link>
-
           <Link to={user ? "/perfil" : "/login"} className={styles.iconBtn}>
             <User size={18} />
           </Link>
-
           <Link to="/carrinho" className={styles.cartBtn}>
             <ShoppingBag size={18} />
-            {totalItems > 0 && (
-              <span className={styles.badge}>{totalItems}</span>
-            )}
+            {totalItems > 0 && <span className={styles.badge}>{totalItems}</span>}
           </Link>
         </div>
       </header>
@@ -82,11 +81,7 @@ export default function Header() {
                 onChange={e => setSearchQ(e.target.value)}
                 className={styles.searchInput}
               />
-              <button
-                type="button"
-                className={styles.searchClose}
-                onClick={() => setSearchOpen(false)}
-              >
+              <button type="button" className={styles.searchClose} onClick={() => setSearchOpen(false)}>
                 <X size={20} />
               </button>
             </form>
@@ -106,28 +101,28 @@ export default function Header() {
                 <X size={20} />
               </button>
             </div>
-
             <nav className={styles.drawerNav}>
               {navLinks.map(link => (
-                <Link
-                  key={link.label}
-                  to={link.path}
-                  className={styles.drawerLink}
-                  onClick={() => setMenuOpen(false)}
-                >
+                <Link key={link.label} to={link.path} className={styles.drawerLink}
+                  onClick={() => setMenuOpen(false)}>
                   {link.label}
                 </Link>
               ))}
               <hr className="divider" style={{ margin: "16px 0" }} />
+              {isAdmin && (
+                <Link to="/admin" className={styles.drawerAdminLink}
+                  onClick={() => setMenuOpen(false)}>
+                  <LayoutDashboard size={14} />
+                  ÁREA DO ADMINISTRADOR
+                </Link>
+              )}
               {user ? (
                 <>
                   <Link to="/perfil" className={styles.drawerLink} onClick={() => setMenuOpen(false)}>
                     MEU PERFIL
                   </Link>
-                  <Link to="/pedidos" className={styles.drawerLink} onClick={() => setMenuOpen(false)}>
-                    MEUS PEDIDOS
-                  </Link>
-                  <button className={styles.drawerLogout} onClick={() => { logout(); setMenuOpen(false); }}>
+                  <button className={styles.drawerLogout}
+                    onClick={() => { logout(); setMenuOpen(false); }}>
                     SAIR
                   </button>
                 </>

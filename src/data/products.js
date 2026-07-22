@@ -130,21 +130,21 @@ export const categories = [
 ];
 
 export const priceRanges = [
-  { label: "ATÉ R$ 49,99", max: 49.99 },
-  { label: "ATÉ R$ 69,99", max: 69.99 },
-  { label: "ATÉ R$ 89,99", max: 89.99 },
+  { label: "ATÉ R$ 59,90", max: 59.90 },
+  { label: "ATÉ R$ 79,90", max: 79.90 },
+  { label: "ATÉ R$ 89,90", max: 89.90 },
   { label: "TODAS AS PEÇAS", max: Infinity },
 ];
 
 export const banners = [
   {
     id: 1,
-    headline: "ESFRIOU?",
-    subline: "Camisetas pesadas para qualquer clima",
+    headline: "Novidades da IΣSOUS NØRTH",
+    subline: "Camisetas para qualquer clima",
     cta: "VER COLEÇÃO",
-    badge: "ATÉ 70% OFF",
+    badge: "ATÉ 30% OFF",
     tag: "DROP 01 — STREETWEAR",
-    bg: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1400&q=80",
+    bg: "public/drop03.jpg",
   },
   {
     id: 2,
@@ -153,22 +153,22 @@ export const banners = [
     cta: "EXPLORAR LINHA CRISTÃ",
     badge: "DROP EXCLUSIVO",
     tag: "DROP 01 — LINHA CRISTÃ",
-    bg: "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=1400&q=80",
+    bg: "public/drop01.jpg",
   },
   {
     id: 3,
     headline: "IΣSOUS DROP 02",
-    subline: "60 peças. Sem reposição.",
+    subline: "Esbanje estilo com a nova coleção",
     cta: "GARANTIR MINHA PEÇA",
     badge: "EDIÇÃO LIMITADA",
     tag: "APENAS ESTA SEMANA",
-    bg: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1400&q=80",
+    bg: "public/drop02.jpg",
   },
 ];
 
 export const navLinks = [
-  { label: "FEMININO", path: "/catalogo?categoria=feminino" },
-  { label: "MASCULINO", path: "/catalogo?categoria=masculino" },
+  { label: "FEMININO", path: "/catalogo?gender=feminino" },
+  { label: "MASCULINO", path: "/catalogo?gender=masculino" },
   { label: "LINHA CRISTÃ", path: "/catalogo?categoria=cristã" },
   { label: "DROPS", path: "/catalogo?categoria=novidades" },
   { label: "OFERTAS", path: "/catalogo?categoria=ofertas" },
@@ -176,7 +176,7 @@ export const navLinks = [
 
 export const metrics = {
   totalPieces: 60,
-  priceStreet: 69.90,
+  priceStreet: 79.90,
   priceChristian: 89.90,
   cost: 26.00,
   grossRevenue: 4594.00,

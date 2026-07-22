@@ -1,22 +1,89 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Heart, Shield, Truck, RefreshCcw } from "lucide-react";
 import { useCart } from "../context/CartContext";
-import { products } from "../data/products";
+import { supabase } from "../lib/supabase";
 import styles from "./ProductDetail.module.css";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
-  const product = products.find(p => p.id === Number(id));
 
+  const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedImg, setSelectedImg] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [wished, setWished] = useState(false);
   const [error, setError] = useState("");
   const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [id]);
+
+  const fetchProduct = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error || !data) {
+        setProduct(null);
+        setLoading(false);
+        return;
+      }
+
+      setProduct(adapt(data));
+
+      // Busca produtos relacionados
+      const { data: rel } = await supabase
+        .from("products")
+        .select("*")
+        .eq("category", data.category)
+        .eq("is_active", true)
+        .neq("id", id)
+        .limit(3);
+
+      setRelated((rel || []).map(adapt));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const adapt = (p) => ({
+    ...p,
+    isNew: p.is_new,
+    isBestSeller: p.is_best_seller,
+    discount: p.discount || 0,
+    images: p.images?.length ? p.images : ["https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&q=80"],
+    sizes: p.sizes || [],
+    colors: p.colors || [],
+  });
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className="container">
+          <div className={styles.loadingLayout}>
+            <div className={styles.skeletonImg} />
+            <div className={styles.skeletonInfo}>
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className={styles.skeletonLine} style={{ width: `${80 - i * 12}%` }} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -47,12 +114,9 @@ export default function ProductDetail() {
     navigate("/carrinho");
   };
 
-  const related = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 3);
-
   return (
     <div className={styles.page}>
       <div className="container">
-        {/* Breadcrumb */}
         <div className={styles.breadcrumb}>
           <button onClick={() => navigate(-1)} className={styles.back}>
             <ArrowLeft size={16} /> VOLTAR
@@ -67,7 +131,7 @@ export default function ProductDetail() {
         </div>
 
         <div className={styles.layout}>
-          {/* Gallery */}
+          {/* Galeria */}
           <div className={styles.gallery}>
             <div className={styles.thumbnails}>
               {product.images.map((img, i) => (
@@ -116,7 +180,7 @@ export default function ProductDetail() {
 
             <hr className="divider" />
 
-            {/* Color */}
+            {/* Cor */}
             <div className={styles.option}>
               <p className={styles.optLabel}>
                 COR: <strong>{selectedColor || "Selecione"}</strong>
@@ -134,7 +198,7 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Size */}
+            {/* Tamanho */}
             <div className={styles.option}>
               <p className={styles.optLabel}>
                 TAMANHO: <strong>{selectedSize || "Selecione"}</strong>
@@ -154,14 +218,13 @@ export default function ProductDetail() {
 
             {error && <p className={styles.error}>{error}</p>}
 
-            {/* Actions */}
             <div className={styles.actions}>
               <button
                 className={`${styles.addBtn} ${added ? styles.addedBtn : ""}`}
                 onClick={handleAdd}
               >
                 <ShoppingBag size={18} />
-                {added ? "ADICIONADO AO CARRINHO!" : "ADICIONAR AO CARRINHO"}
+                {added ? "ADICIONADO!" : "ADICIONAR AO CARRINHO"}
               </button>
               <button className={styles.buyBtn} onClick={handleBuyNow}>
                 COMPRAR AGORA
@@ -174,7 +237,6 @@ export default function ProductDetail() {
               </button>
             </div>
 
-            {/* Description */}
             <div className={styles.desc}>
               <h3 className={styles.descTitle}>SOBRE A PEÇA</h3>
               <p className={styles.descText}>{product.description}</p>
@@ -186,25 +248,15 @@ export default function ProductDetail() {
               </ul>
             </div>
 
-            {/* Guarantees */}
             <div className={styles.guarantees}>
-              <div className={styles.guarantee}>
-                <Truck size={16} />
-                <span>Entrega para todo o Brasil</span>
-              </div>
-              <div className={styles.guarantee}>
-                <RefreshCcw size={16} />
-                <span>30 dias para trocar</span>
-              </div>
-              <div className={styles.guarantee}>
-                <Shield size={16} />
-                <span>Compra 100% segura</span>
-              </div>
+              <div className={styles.guarantee}><Truck size={16} /><span>Entrega para todo o Brasil</span></div>
+              <div className={styles.guarantee}><RefreshCcw size={16} /><span>30 dias para trocar</span></div>
+              <div className={styles.guarantee}><Shield size={16} /><span>Compra 100% segura</span></div>
             </div>
           </div>
         </div>
 
-        {/* Related */}
+        {/* Relacionados */}
         {related.length > 0 && (
           <div className={styles.related}>
             <p className="section-title">VOCÊ TAMBÉM VAI GOSTAR</p>

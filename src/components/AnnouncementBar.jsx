@@ -3,9 +3,9 @@ import { X } from "lucide-react";
 import styles from "./AnnouncementBar.module.css";
 
 const messages = [
-  "🚀 FRETE GRÁTIS acima de R$ 199,90 — USE: SIGMA10 E GANHE 10% OFF NA PRIMEIRA COMPRA",
-  "⚡ DROP 02 DISPONÍVEL — APENAS 60 PEÇAS — SEM REPOSIÇÃO",
-  "💳 PIX COM DESCONTO EXTRA — PARCELE EM ATÉ 12X SEM JUROS NO CARTÃO",
+  " FRETE GRÁTIS acima de R$ 199,90",
+  " DROP 02 DISPONÍVEL — CONFIRA AS NOVIDADES",
+  " PIX COM DESCONTO EXTRA — PARCELE EM ATÉ 12X SEM JUROS NO CARTÃO",
 ];
 
 export default function AnnouncementBar() {
